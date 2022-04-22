@@ -81,12 +81,9 @@ class Population {
   }
 
   private void evolve() {
-    println("Generation", this.generation, "summary:");
-    println("Best fitness:", this.deadBirds.get(this.size - 1).fitness);
-    println("Median fitness:", this.deadBirds.get(this.size / 2).fitness);
-
     // Save the best bird (elitism). Deadbirds is already sorted by fitness.
     Bird best = this.deadBirds.get(this.size -1);
+    float bestFitness = best.fitness;
     best.reset();
     this.population.add(best);
 
@@ -94,6 +91,11 @@ class Population {
 
     float fitnessSum = 0.0;
     for (Bird b : this.deadBirds) fitnessSum += b.fitness;
+    
+    println("Generation", this.generation, "summary:");
+    println("Best fitness:", bestFitness);
+    println("Mean fitness:", fitnessSum / this.size);
+    println("Median fitness:", this.deadBirds.get(this.size / 2).fitness);
 
     for (int i = 0; i < this.size - 1; i++) {
       float rollingSum = 0.0;
