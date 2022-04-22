@@ -21,54 +21,62 @@ class Population {
   }
 
   public void update() {
-    // Draw current generation.
-    text(this.generation, 10, 20);
-
-    // Remove pipes that are out of bounds.
-    Pipe firstPipe = this.pipes.getFirst();
-    if (firstPipe.x + firstPipe.width < 0) {
-      this.pipes.removeFirst();
-    }
-
-    // Add new pipes when required.
-    Pipe lastPipe = this.pipes.getLast();
-    if (lastPipe.x + lastPipe.width + PIPE_SPACING < width) {
-      this.pipes.add(new Pipe(width, PIPE_WIDTH, PIPE_OPENING_SIZE));
-    }
-
-    // Find nearest pipe.
-    Pipe nearestPipe = null;
-    for (Pipe p : this.pipes) {
-      if (!(p.x + p.width < BIRD_X - BIRD_RADIUS)) {
-        nearestPipe = p;
-        break;
-      }
-    }
-
-    // Update all the birds.
-    for (int i = this.population.size() - 1; i >= 0; i--) {
-      Bird b = this.population.get(i);
-      b.update(nearestPipe);
+    for (Bird b : this.population)
       b.show();
-
-      // Check if dead.
-      if (this.birdIsDead(b, nearestPipe)) {
-        this.deadBirds.add(b);
-        this.population.remove(i);
-      } else {
-        b.fitness++;
-      }
-    }
-
-    // Draw then move all pipes.
-    for (Pipe p : this.pipes) {
+    for (Pipe p : this.pipes)
       p.show();
-      p.x -= PIPE_SPEED;
-    }
 
-    // Evolve if all the birds in the current generation have died.
-    if (this.population.size() == 0) {
-      this.evolve();
+    for (int step = 0; step < stepsPerFrame; step++) {
+
+      // Draw current generation.
+      text(this.generation, 10, 20);
+
+      // Remove pipes that are out of bounds.
+      Pipe firstPipe = this.pipes.getFirst();
+      if (firstPipe.x + firstPipe.width < 0) {
+        this.pipes.removeFirst();
+      }
+
+      // Add new pipes when required.
+      Pipe lastPipe = this.pipes.getLast();
+      if (lastPipe.x + lastPipe.width + PIPE_SPACING < width) {
+        this.pipes.add(new Pipe(width, PIPE_WIDTH, PIPE_OPENING_SIZE));
+      }
+
+      // Find nearest pipe.
+      Pipe nearestPipe = null;
+      for (Pipe p : this.pipes) {
+        if (!(p.x + p.width < BIRD_X - BIRD_RADIUS)) {
+          nearestPipe = p;
+          break;
+        }
+      }
+
+      // Update all the birds.
+      for (int i = this.population.size() - 1; i >= 0; i--) {
+        Bird b = this.population.get(i);
+        b.update(nearestPipe);
+        //b.show();
+
+        // Check if dead.
+        if (this.birdIsDead(b, nearestPipe)) {
+          this.deadBirds.add(b);
+          this.population.remove(i);
+        } else {
+          b.fitness++;
+        }
+      }
+
+      // Draw then move all pipes.
+      for (Pipe p : this.pipes) {
+        //p.show();
+        p.x -= PIPE_SPEED;
+      }
+
+      // Evolve if all the birds in the current generation have died.
+      if (this.population.size() == 0) {
+        this.evolve();
+      }
     }
   }
 
@@ -94,7 +102,7 @@ class Population {
         rollingSum += b.fitness;
         if (rollingSum >= chance) {
           Bird child = b.clone();
-          child.mutateSelf(0.5);
+          child.mutateSelf(MUT_RATE);
           this.population.add(child);
           break;
         }
@@ -102,13 +110,6 @@ class Population {
     }
 
     this.deadBirds.clear();
-
-    // Create new birds.
-    //for (int i = 0; i < this.size; i++) {
-    //  Bird child = this.tournamentSelect(5).clone();
-    //  child.mutateSelf(0.5);
-    //  this.population.add(child);
-    //}
 
     // Reset pipes.
     this.pipes.clear();

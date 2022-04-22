@@ -3,7 +3,7 @@ class Bird {
   float x ; // This stays constant
   float y;
   float vel = 0.0;
-  float jumpStrength = 10.0;
+  float jumpStrength = 12.0;
   int fitness = 0;
 
   public Bird(float x) {
@@ -15,17 +15,18 @@ class Bird {
     // 3. vertical distance to top of nearest pipe
     // 4. vertical distance to botton of nearest pipe
     // 5. horizontal distance to start of nearest pipe
-    this.brain = new NeuralNet(5, 5, 1);
+    this.brain = new NeuralNet(5, 8, 2);
   }
 
   public void update(Pipe nearestPipe) {
     float[] inputs = new float[5];
-    inputs[0] = this.y;
+    inputs[0] = this.y / height;
     inputs[1] = this.vel;
-    inputs[2] = nearestPipe.openingStart - this.y;
-    inputs[3] = nearestPipe.openingEnd - this.y;
-    inputs[4] = nearestPipe.x - this.x;
-    boolean move = this.brain.predict(inputs)[0] > 0.5;
+    inputs[2] = (nearestPipe.openingStart - this.y) / height;
+    inputs[3] = (nearestPipe.openingEnd - this.y) / height;
+    inputs[4] = (nearestPipe.x - this.x) / PIPE_SPACING;
+    float[] outputs = this.brain.predict(inputs);
+    boolean move = outputs[0] > outputs[1];
     if (move) this.vel -= this.jumpStrength;
     this.vel += GRAVITY;
     this.y += this.vel;
