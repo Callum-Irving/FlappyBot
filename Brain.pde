@@ -105,6 +105,7 @@ class NeuralNet {
     return copy;
   }
 
+  // Mutate all the weights using a normal distribution with standard deviation sd.
   public void mutate(float sd) {
     for (int i = 0; i < this.weights.length; i++) {
       FMatrixRMaj weightMut = this.weights[i].createLike();
